@@ -52,8 +52,7 @@ defmodule Rocketpay.Account.Operation do
   end
 
   defp account_operation_name(operation) do
-    operation
-    |> "account_#{Atom.to_string()}"
+    "account_#{Atom.to_string(operation)}"
     |> String.to_atom()
   end
 end
