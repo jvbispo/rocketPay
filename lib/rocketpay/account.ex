@@ -9,7 +9,7 @@ defmodule Rocketpay.Account do
 
   @required_params [:balance, :user_id]
 
-  schema "account" do
+  schema "accounts" do
     field :balance , :decimal
     belongs_to :user, User
 
