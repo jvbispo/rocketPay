@@ -20,11 +20,12 @@ defmodule RocketpayWeb.Router do
   end
 
   scope "/api", RocketpayWeb do
-    pipe_through [:api, :auth]
+    pipe_through [:api]
 
     post "/accounts/:id/deposit", AccountsController, :deposit
-    post "/accounts/transaction", AccountsController, :transaction
     post "/accounts/:id/withdraw", AccountsController, :withdraw
+    post "/accounts/transaction", AccountsController, :transaction
+
   end
 
   # Enables LiveDashboard only for development

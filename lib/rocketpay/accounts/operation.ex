@@ -1,6 +1,6 @@
 defmodule Rocketpay.Account.Operation do
   alias Ecto.Multi
-  alias Rocketpay.{Account, Repo}
+  alias Rocketpay.{Account}
 
   def call(%{"id" => id, "value" => value}, operation) do
     operation_name = account_operation_name(operation)
@@ -9,7 +9,6 @@ defmodule Rocketpay.Account.Operation do
     |> Multi.run(operation, fn repo, changes ->
       account = Map.get(changes, operation_name)
       update_balance(repo, account, value, operation) end)
-    |> run_transaction()
   end
 
   defp get_account(repo, id) do
@@ -21,11 +20,11 @@ defmodule Rocketpay.Account.Operation do
 
   defp update_balance(repo, account, value, operation ) do
     account
-    |> sum_values(value, operation)
+    |> operation(value, operation)
     |> update_account(repo, account)
   end
 
-  defp sum_values(%Account{balance: balance}, value, operation) do
+  defp operation(%Account{balance: balance}, value, operation) do
     value
     |> Decimal.cast()
     |> handle_cast(balance, operation)
@@ -44,12 +43,12 @@ defmodule Rocketpay.Account.Operation do
     |> repo.update()
   end
 
-  defp run_transaction(multi) do
-    case Repo.transaction(multi) do
-      {:error, _operation, reason, _changes} -> {{:error, reason}}
-      {:ok, %{update_balance: account}} -> {:ok, account}
-    end
-  end
+  # defp run_transaction(multi) do
+  #   case Repo.transaction(multi) do
+  #     {:error, _operation, reason, _changes} -> {:error, reason}
+  #     {:ok, %{update_balance: account}} -> {:ok, account}
+  #   end
+  # end
 
   defp account_operation_name(operation) do
     "account_#{Atom.to_string(operation)}"
